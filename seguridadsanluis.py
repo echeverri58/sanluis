@@ -9,6 +9,24 @@ info_graficos = [
     # ... (añadir el resto de tus URLs y detalles de gráficos)
 ]
 
+def crear_grafico(info, columna):
+    df = pd.read_csv(info['url'])
+    df['fecha_hecho'] = pd.to_datetime(df['fecha_hecho'])
+    df['fecha_hecho'] = df['fecha_hecho'].dt.year
+    cantidad_por_año = df.groupby('fecha_hecho')['cantidad'].sum().reset_index()
+
+    # Crear el gráfico Altair
+    chart = alt.Chart(cantidad_por_año).mark_bar().encode(
+        x=alt.X('fecha_hecho:O', title=info['etiqueta_x']),
+        y=alt.Y('cantidad:Q', title=info['etiqueta_y']),
+        tooltip=['fecha_hecho:N', alt.Tooltip('cantidad:Q', title='Cantidad')]
+    ).properties(
+        title=info['titulo']
+    )
+
+    # Mostrar el gráfico Altair en Streamlit
+    columna.altair_chart(chart, use_container_width=True)
+
 # Configuración de la página de Streamlit
 st.title("SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA DEL MUNICIPIO DE SAN LUIS ANTIOQUIA")
 
@@ -28,6 +46,7 @@ for i in range(num_filas):
         if index < len(info_graficos):
             info = info_graficos[index]
             crear_grafico(info, col1 if j == 0 else col2)
+
 
 
 
