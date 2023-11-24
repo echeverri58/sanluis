@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from vega_datasets import data
 
 # Lista de diccionarios con la información de cada gráfico
 info_graficos = [
@@ -22,7 +23,7 @@ for i, info in enumerate(info_graficos):
     df['fecha_hecho'] = df['fecha_hecho'].dt.year
     cantidad_por_año = df.groupby('fecha_hecho')['cantidad'].sum().reset_index()
 
-    # Crear el gráfico Altair
+    # Crear el gráfico Altair con animación
     chart = alt.Chart(cantidad_por_año).mark_bar().encode(
         x=alt.X('fecha_hecho:O', title=info['etiqueta_x']),
         y=alt.Y('cantidad:Q', title=info['etiqueta_y']),
@@ -38,6 +39,7 @@ for i, info in enumerate(info_graficos):
     else:
         with col2:
             st.altair_chart(chart, use_container_width=True)
+
 
 
 
