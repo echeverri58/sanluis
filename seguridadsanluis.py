@@ -26,8 +26,3 @@ st.plotly_chart(fig)
 # Mostrar la aplicación
 st.show()
 
-
-
-
-
-
