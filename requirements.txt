@@ -1,5 +1,8 @@
 altair
 matplotlib
 pandas
-streamlit
+altair==4.1.0
+vega==3.4.0
+vega_datasets==0.9.0
+streamlit==0.87.0  # (o la versión que estés utilizando)
 
