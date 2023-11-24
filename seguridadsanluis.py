@@ -1,6 +1,6 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import pandas as pd
+import altair as alt
 
 # Lista de diccionarios con la información de cada gráfico
 info_graficos = [
@@ -23,32 +23,34 @@ info_graficos = [
     # ... (repite el patrón para otros gráficos)
 ]
 
-def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
-    df = pd.read_csv(url)
-    df['fecha_hecho'] = pd.to_datetime(df['fecha_hecho'])
-    df['fecha_hecho'] = df['fecha_hecho'].dt.year
-    cantidad_por_año = df['cantidad'].groupby(df['fecha_hecho']).sum()
-    cantidad_por_año = cantidad_por_año.astype('int')
-    cantidad_por_año.index = cantidad_por_año.index.astype('str')
-
-    fig, ax = plt.subplots()
-    ax.bar(cantidad_por_año.index, cantidad_por_año.values)
-    ax.set_xlabel(etiqueta_x)
-    ax.set_ylabel(etiqueta_y)
-    ax.set_title(titulo)
-
-    for i in range(len(cantidad_por_año)):
-        ax.annotate(cantidad_por_año.values[i], (cantidad_por_año.index[i], cantidad_por_año.values[i]), ha='center', va='bottom')
-
-    ax.set_xticks(cantidad_por_año.index)
-    ax.set_xticklabels(cantidad_por_año.index, rotation=90)
-
-    st.write(f"## {titulo}")
-    st.pyplot(fig)
-
 # Configuración de la página de Streamlit
 st.title("SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA DEL MUNICIPIO DE SAN LUIS ANTIOQUIA")
 
-# Añadir gráficos uno por uno
-for info in info_graficos:
-    crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
+# Configuración de la cuadrícula
+num_filas = 4
+num_columnas = 3
+graficos_por_fila = len(info_graficos) // num_filas
+
+# Crear la cuadrícula
+for i in range(num_filas):
+    for j in range(num_columnas):
+        idx = i * num_columnas + j
+        if idx < len(info_graficos):
+            info = info_graficos[idx]
+            url, titulo, etiqueta_x, etiqueta_y = info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y']
+
+            st.subheader(titulo)
+            
+            df = pd.read_csv(url)
+            df['fecha_hecho'] = pd.to_datetime(df['fecha_hecho'])
+            df['fecha_hecho'] = df['fecha_hecho'].dt.year
+            cantidad_por_año = df.groupby('fecha_hecho')['cantidad'].sum().reset_index()
+
+            # Crear gráfico interactivo con Altair
+            chart = alt.Chart(cantidad_por_año).mark_bar().encode(
+                x=etiqueta_x,
+                y=etiqueta_y,
+                tooltip=[etiqueta_x, etiqueta_y]
+            ).interactive()
+
+            st.altair_chart(chart, use_container_width=True)
