@@ -44,7 +44,7 @@ num_filas = -(-len(info_graficos) // num_columnas)  # Cálculo para redondear ha
 
 # Añadir gráficos en una cuadrícula
 for i in range(num_filas):
-    cols = st.columns(num_columnas)
+    cols = st.beta_columns(num_columnas)
     for j in range(num_columnas):
         index = i * num_columnas + j
         if index < len(info_graficos):
