@@ -11,8 +11,6 @@ info_graficos = [
 
 ]
 
-]
-
 def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
     df = pd.read_csv(url)
     # Asegúrate de que las columnas 'fecha_hecho' y 'cantidad' existan en tu conjunto de datos
@@ -34,14 +32,4 @@ for info in info_graficos:
     chart = crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
     # Mostrar el gráfico
     st.altair_chart(chart, use_container_width=True)
-
-
-
-
-
-
-
-
-
-
 
