@@ -1,40 +1,59 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
-def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
-    st.write(f"## {titulo}")
-    df = pd.read_csv(url)
-    df['fecha_hecho'] = pd.to_datetime(df['fecha_hecho'])
-    df['fecha_hecho'] = df['fecha_hecho'].dt.year
-    cantidad_por_año = df['cantidad'].groupby(df['fecha_hecho']).sum()
-    cantidad_por_año = cantidad_por_año.astype('int')
-    cantidad_por_año.index = cantidad_por_año.index.astype('str')
+# Definir la URL
+url = "https://www.datos.gov.co/resource/ntej-qq7v.csv?$query=SELECT%0A%20%20%60fecha_hecho%60%2C%0A%20%20%60cod_depto%60%2C%0A%20%20%60departamento%60%2C%0A%20%20%60cod_muni%60%2C%0A%20%20%60municipio%60%2C%0A%20%20%60cantidad%60%0AWHERE%0A%20%20caseless_one_of(%60departamento%60%2C%20%22ANTIOQUIA%22)%0A%20%20AND%20caseless_one_of(%60municipio%60%2C%20%22SAN%20LUIS%22)%0AORDER%20BY%20%60fecha_hecho%60%20DESC%20NULL%20LAST"
 
-    st.bar_chart(cantidad_por_año, use_container_width=True)
+# Leer datos desde la URL
+df = pd.read_csv(url)
 
-    st.xlabel(etiqueta_x)
-    st.ylabel(etiqueta_y)
+# Configurar la aplicación Streamlit
+st.title("Visualización de Datos")
+st.subheader("Lesiones accidente tránsito en San Luis")
 
-# Configurar la página de Streamlit
-st.set_page_config(page_title="SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA", page_icon=":chart_with_upwards_trend:")
+# Mostrar los primeros registros de los datos
+st.write("Primeros registros de los datos:")
+st.write(df.head())
 
-# Añadir líneas de texto personalizadas
-st.title("MUNICIPIO DE SAN LUIS")
-st.write("SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA")
+# Gráfico de barras
+fig, ax = plt.subplots()
+ax.bar(df["fecha_hecho"], df["cantidad"])
+plt.xlabel("Año")
+plt.ylabel("Cantidad")
+plt.title("Lesiones accidente tránsito San Luis")
+st.pyplot(fig)
 
-# URLs específicas para cada gráfico
-info_graficos = [
-    {'url': "https://www.datos.gov.co/resource/meew-mguv.csv?$query=SELECT%0A%20%20%60departamento%60%2C%0A%20%20%60municipio%60%2C%0A%20%20%60codigo_dane%60%2C%0A%20%20%60armas_medios%60%2C%0A%20%20%60fecha_hecho%60%2C%0A%20%20%60genero%60%2C%0A%20%20%60grupo_etario%60%2C%0A%20%20%60cantidad%60%0AWHERE%0A%20%20caseless_one_of(%60departamento%60%2C%20%22ANTIOQUIA%22)%0A%20%20AND%20caseless_one_of(%60municipio%60%2C%20%22SAN%20LUIS%22)",
-     'titulo': 'Amenazas en San Luis Antioquia por año', 'etiqueta_x': 'Año', 'etiqueta_y': 'Cantidad'},
-    # ... Repite esto para los demás gráficos
-]
+# Gráfico de dispersión
+st.write("Gráfico de dispersión:")
+st.scatter_chart(df[["fecha_hecho", "cantidad"]])
 
-# Mostrar los gráficos con Streamlit
-for info in info_graficos:
-    crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
+# Gráfico de línea
+st.write("Gráfico de línea:")
+st.line_chart(df[["fecha_hecho", "cantidad"]])
 
-# Agregar nota en la parte inferior
-st.text("Creado por John Alexander Echeverry Ocampo, politólogo y analista de datos")
+# Histograma
+st.write("Histograma:")
+st.hist(df["cantidad"], bins=10, edgecolor='black')
+
+# Mapa de calor
+st.write("Mapa de calor:")
+st.heatmap(df.corr(), annot=True)
+
+# Boxplot
+st.write("Boxplot:")
+st.box_plot(df["cantidad"])
+
+# Resumen estadístico
+st.write("Resumen estadístico:")
+st.write(df.describe())
+
+# Guardar el DataFrame en un archivo CSV (opcional)
+# df.to_csv("datos_procesados.csv", index=False)
+
+# Mostrar la aplicación
+st.show()
+
 
 
 
