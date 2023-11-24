@@ -9,30 +9,36 @@ info_graficos = [
     # ... (repite el patrón para otros gráficos)
 ]
 
-def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
-    df = pd.read_csv(url)
+# Configuración de la página de Streamlit
+st.title("SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA DEL MUNICIPIO DE SAN LUIS ANTIOQUIA")
+
+# Dividir la pantalla en dos columnas
+col1, col2 = st.beta_columns(2)
+
+# Añadir gráficos uno por uno a cada columna
+for i, info in enumerate(info_graficos):
+    df = pd.read_csv(info['url'])
     df['fecha_hecho'] = pd.to_datetime(df['fecha_hecho'])
     df['fecha_hecho'] = df['fecha_hecho'].dt.year
     cantidad_por_año = df.groupby('fecha_hecho')['cantidad'].sum().reset_index()
 
     # Crear el gráfico Altair
     chart = alt.Chart(cantidad_por_año).mark_bar().encode(
-        x=alt.X('fecha_hecho:O', title=etiqueta_x),
-        y=alt.Y('cantidad:Q', title=etiqueta_y),
+        x=alt.X('fecha_hecho:O', title=info['etiqueta_x']),
+        y=alt.Y('cantidad:Q', title=info['etiqueta_y']),
         tooltip=['fecha_hecho:N', alt.Tooltip('cantidad:Q', title='Cantidad')]
     ).properties(
-        title=titulo
+        title=info['titulo']
     )
 
-    # Mostrar el gráfico Altair en Streamlit
-    st.altair_chart(chart, use_container_width=True)
+    # Mostrar el gráfico Altair en Streamlit con animación
+    if i % 2 == 0:
+        with col1:
+            st.altair_chart(chart, use_container_width=True)
+    else:
+        with col2:
+            st.altair_chart(chart, use_container_width=True)
 
-# Configuración de la página de Streamlit
-st.title("SISTEMA DE INFORMACIÓN Y SEGURIDAD CIUDADANA DEL MUNICIPIO DE SAN LUIS ANTIOQUIA")
-
-# Añadir gráficos uno por uno
-for info in info_graficos:
-    crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
 
 
 
