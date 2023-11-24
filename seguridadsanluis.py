@@ -23,6 +23,8 @@ info_graficos = [
     # ... (repite el patrón para otros gráficos)
 ]
 
+]
+
 def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
     df = pd.read_csv(url)
     # Asegúrate de que las columnas 'fecha_hecho' y 'cantidad' existan en tu conjunto de datos
@@ -38,21 +40,12 @@ def crear_grafico(url, titulo, etiqueta_x, etiqueta_y):
 # Configuración de la página de Streamlit
 st.title("Visualización de Datos")
 
-# Configurar el diseño de cuadrícula (puedes ajustar el número de columnas según sea necesario)
-num_columnas = 3
-num_filas = -(-len(info_graficos) // num_columnas)  # Cálculo para redondear hacia arriba la división
-
-# Añadir gráficos en una cuadrícula
-for i in range(num_filas):
-    cols = st.beta_columns(num_columnas)
-    for j in range(num_columnas):
-        index = i * num_columnas + j
-        if index < len(info_graficos):
-            info = info_graficos[index]
-            # Crear el gráfico Altair
-            chart = crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
-            # Mostrar el gráfico en la columna correspondiente
-            cols[j].altair_chart(chart, use_container_width=True)
+# Añadir gráficos en filas
+for info in info_graficos:
+    # Crear el gráfico Altair
+    chart = crear_grafico(info['url'], info['titulo'], info['etiqueta_x'], info['etiqueta_y'])
+    # Mostrar el gráfico
+    st.altair_chart(chart, use_container_width=True)
 
 
 
